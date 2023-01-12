@@ -1,28 +1,32 @@
 package com.jk.lovecalculator
-
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.jk.lovecalculator.databinding.FragmentCalculateBinding
-import com.jk.lovecalculator.model.LoveModel
-import com.jk.lovecalculator.retrofit.RetrofitService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.jk.lovecalculator.main.LoveViewModel
+import com.jk.lovecalculator.onboard.Prefs
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class CalculateFragment : Fragment() {
 
-    lateinit var binding: FragmentCalculateBinding
+    private lateinit var binding: FragmentCalculateBinding
+    private val viewModel: LoveViewModel by viewModels()
+
+    @Inject
+    lateinit var pref: Prefs
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentCalculateBinding.inflate(layoutInflater, container, false)
         return binding.root
 
@@ -30,39 +34,32 @@ class CalculateFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        pref.onPref(requireContext())
+        if (pref.isOnBoardingShow()) {
+            findNavController().navigate(R.id.onBoardingFragment)
+        }
         initClicker()
     }
 
     private fun initClicker() {
         with(binding) {
+            btnHistory.setOnClickListener {
+                findNavController().navigate(R.id.historyFragment)
+            }
             btnCalculate.setOnClickListener {
-                RetrofitService().getApi().getLoveResult(
+                viewModel.getLiveLoveModel(
                     firstName = etName1.text.toString(),
                     secondName = etName2.text.toString()
-                ).enqueue(object : Callback<LoveModel> {
-                    override fun onResponse(call: Call<LoveModel>, response: Response<LoveModel>) {
-                        if (response.isSuccessful) {
-                            val stringResponse = LoveModel(
-                                response.body()?.firstName.toString(),
-                                response.body()?.secondName.toString(),
-                                response.body()?.percentage.toString(),
-                                response.body()?.result.toString(),
-                            )
-                            findNavController().navigate(
-                                R.id.resultFragment,
-                                bundleOf("key" to stringResponse)
-                            )
-                        } else {
-                            Toast.makeText(context, "An error occurred", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<LoveModel>, t: Throwable) {
-                        Log.d("ololo", "onFailure:" + t.message)
-                    }
-                })
-
+                ).observe(viewLifecycleOwner,
+                    Observer {
+                        viewLifecycleOwner
+                        val data = it
+                        findNavController().navigate(
+                            R.id.resultFragment, bundleOf("key" to data)
+                        )
+                    })
             }
+
         }
     }
 }

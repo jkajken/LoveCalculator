@@ -1,7 +1,6 @@
-package com.jk.lovecalculator.retrofit
+package com.jk.lovecalculator.remote.retrofit
 
-import com.google.gson.Gson
-import com.jk.lovecalculator.LoveApi
+import com.jk.lovecalculator.remote.LoveApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -10,5 +9,5 @@ class RetrofitService {
     private val retrofit = Retrofit.Builder().baseUrl("https://love-calculator.p.rapidapi.com/")
         .addConverterFactory(GsonConverterFactory.create()).build()
 
-    fun getApi():LoveApi = retrofit.create(LoveApi ::class.java)
+    fun getLoveApi(): LoveApi = retrofit.create(LoveApi ::class.java)
 }

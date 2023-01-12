@@ -5,10 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.clearFragmentResult
 import androidx.navigation.fragment.findNavController
 import com.jk.lovecalculator.databinding.FragmentResultBinding
-import com.jk.lovecalculator.model.LoveModel
+import com.jk.lovecalculator.remote.model.LoveModel
 
 class ResultFragment : Fragment() {
 
@@ -17,7 +16,7 @@ class ResultFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentResultBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -39,9 +38,11 @@ class ResultFragment : Fragment() {
         with(binding) {
             tvMe.text = data.firstName
             tvYou.text = data.secondName
-            tvPercentage.text = data.percentage + ("%")
+            tvPercentage.text = buildString {
+                append(data.percentage)
+                append(("%"))
+            }
             tvResult.text = data.result
         }
-
     }
 }

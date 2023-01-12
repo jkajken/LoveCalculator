@@ -1,6 +1,6 @@
-package com.jk.lovecalculator
+package com.jk.lovecalculator.remote
 
-import com.jk.lovecalculator.model.LoveModel
+import com.jk.lovecalculator.remote.model.LoveModel
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
